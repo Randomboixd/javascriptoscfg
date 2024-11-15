@@ -15,6 +15,8 @@ export default class System {
     }
 
     public packages: Package[] = []
+    public COPY: { from: string, to: string }[] = []
+    public executeCommands: string[] = []
 
     constructor() {
 

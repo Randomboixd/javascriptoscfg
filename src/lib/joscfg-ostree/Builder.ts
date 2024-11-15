@@ -1,7 +1,11 @@
 import buildAddPkgs from "./buildstages/buildAddPkgs";
 import buildRemovePkgs from "./buildstages/buildRemovePkgs";
 import Commit from "./buildstages/Commit";
+import COPYStages from "./buildstages/COPYStages";
+import customBuiltBinaries from "./buildstages/customBuiltBinaries";
+import ExecStage from "./buildstages/ExecStage";
 import mkImageHeaders from "./buildstages/mkImageHeaders";
+import mkImageLabels from "./buildstages/mkImageLabels";
 import type System from "./System";
 
 
@@ -29,9 +33,14 @@ export default class Builder {
             ? `RUN ${buildRemovePkgs(this.image)} && \\`
             : 'RUN echo "No packages will be removed." && \\';
         const addPkgsCommand = this.image.packages.some(p => p.packageType.type === 'rpm-ostree' && p.packageType.method === "install")
-            ? `${buildAddPkgs(this.image)} && \\`
-            : `echo "No packages will be installed." && \\`
+            ? `${buildAddPkgs(this.image)}`
+            : `echo "No packages will be installed."`
+        
+        const COPY = COPYStages(this.image)
+        const customBinaries = customBuiltBinaries(this.image)
+        const run = ExecStage(this.image)
+        const labels = mkImageLabels(this.image)
     
-        return `${imageHeaders}\n${removePkgsCommand}\n${addPkgsCommand}\n${Commit()}`.trim();
+        return `${imageHeaders}\n# Add image labels\n${labels}\n \n# Copy stage\n${COPY}\n \n# Custom binaries stage\n${customBinaries}\n \n# Install/Remove packages\n${removePkgsCommand}\n${addPkgsCommand}\n \n# Execution stage\n${run}\n \n# Commit everything\nRUN ${Commit()}\n# Goodbye!`.trim();
     }
 }

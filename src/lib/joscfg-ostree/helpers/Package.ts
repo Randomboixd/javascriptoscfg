@@ -1,4 +1,4 @@
-import type Package from "./types/Package"
+import type Package from "../types/Package"
 
 export default (name: string): Package => {
     return {
