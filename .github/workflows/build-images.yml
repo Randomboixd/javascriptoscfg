@@ -199,7 +199,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: sigstore/cosign-installer@v3.0.3
+      - uses: sigstore/cosign-installer@v3.7.0
         if: github.event_name != 'pull_request'
 
       # Modification: Replace the environment variable's name with SIGN
