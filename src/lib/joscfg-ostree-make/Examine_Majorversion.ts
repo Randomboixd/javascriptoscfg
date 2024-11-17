@@ -25,10 +25,10 @@ if (typeof values.fileName !== "string") {
 
 const pathToSystems = path.join(__dirname, "..", "..", "..")
 
-const { system } : { system: { system: System | undefined } } = require(path.join(pathToSystems, "systems", values.fileName))
+const { system } : { system: System | undefined } = require(path.join(pathToSystems, "systems", values.fileName))
 
-if (!system.system) {
+if (!system) {
     throw new Error("File isn't a valid system.")
 }
 
-console.log(system.system.getReader().channelVersion)
+console.log(system.getReader().channelVersion)
