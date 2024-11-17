@@ -11,8 +11,7 @@ export default (image: System) => {
     let result: string = ""
     customPkgs.forEach(p => {
         if (p.packageType.type !== "binary") return
-        console.log(p.packageType.src)
-        result += `# Copy custom binary '${p.name}' to /usr/bin\nCOPY ${p.packageType.src} /usr/bin/\nRUN ls\n`
+        result += `# Copy custom binary '${p.name}' to /usr/bin\nCOPY ${p.packageType.src} /usr/bin/\n`
     })
     return result
 }
