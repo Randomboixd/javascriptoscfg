@@ -22,6 +22,10 @@ export default class System {
 
     }
 
+    /**
+     * Get an object with the private values of this System.
+     * @returns The values
+     */
     public getReader() {
         return {
             channel: this.channel,
@@ -32,6 +36,12 @@ export default class System {
         }
     }
 
+    /**
+     * Set the base image that the system will use.
+     * @param channelString - An image. By default your IDE should recommend some.
+     * @param version - Optional. But a version. Could be given as a string or a number. Defaults to "latest"
+     * @returns - System so you can chain things together.
+     */
     public setChannel(channelString: Channels, version?: Versions): System {
         this.channel = channelString
         this.channelVersion = version ? version : "latest"
@@ -41,12 +51,23 @@ export default class System {
         return this
     }
 
+    /**
+     * Create a derivation.
+     * @param derivationCfg - A function that uses the derivation then applies it. 
+     * @returns - System.
+     */
     public makeDerivation(derivationCfg: (input: Derivation) => void): System {
         const derivation = new Derivation(this)
         derivationCfg(derivation)
         return this
     }
 
+    /**
+     * Set the image name and descriptions.
+     * @param name - name.
+     * @param description - description.
+     * @returns - System.
+     */
     public setPublishedImageConfig(name: string, description: string): System {
         this.published = {
             image_name: name,

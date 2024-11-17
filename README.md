@@ -5,6 +5,32 @@ your best nightmare, Javascript! ... actually typescript sorry.
 
 Currently everything here is a concept. While `Builder.ts` can generate a Containerfile (only a string though), i am not guaranteeing that it will make anything that works, as currently i am just going through a lot of google pages, while trying to understand what i am even doing.
 
+## Licenses and things.
+This project is primarily licensed under the MIT License. Portions of this codebase are derived from the ublue-os/ubuntu repository, which is licensed under the Apache License 2.0. For more information, see the `LICENSE` and `LICENSE-APACHE` files.
+
+I am not really good at licenses though, as i am not a lawyer. if i did something wrong, make a pull request.
+
+Here is what i changed:
+1. **Changing names**:
+   - Original: `push-ghcr`
+   - Updated to: `makeContainers`
+   - Reason: Reflects the expanded scope of the job.
+
+2. **Scheduled Time**:
+   - Original: `cron: "20 03 * * *"`
+   - Updated to: `cron: "00 06 * * *"`
+   - Reason: Apparently this is 20minutes after ublue images are built.
+
+3. **Additional dependencies and things.**:
+   - Added steps to install `bun` and project dependencies.
+
+4. **Metadata changes**:
+   - Removed static metadata labels in favor of dynamic values generated from `Examine-(value).ts` files.
+
+If you want to see the EXACT changes. I invite you to look at the `.github/workflow/build.yml` file. I marked EVERY modification there. Or atleast i hope i got all.
+
+Remember i am **NOT** a lawyer, and my knowledge in licenses is basically: "oooh mit license. wow. why not" and i am certain that i missed a little detail. Please make an issue or pull request if i did.
+
 ## Some more examples
 
 Let's say that we want a system that has `distrobox`, `fastfetch`, and `waydroid` installed. You would have two ways to do it:

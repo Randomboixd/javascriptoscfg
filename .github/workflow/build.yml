@@ -1,0 +1,219 @@
+# This file is based on ublue-os/ubuntu's build.yml.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at:
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+# Modification: call it makeImages instead.
+name: makeImages
+on:
+  pull_request:
+    branches:
+      - main
+
+    paths-ignore:
+      - '**.md'
+
+  schedule:
+    # Modification: Build at 06:00UTC instead because that's 20 minutes after Ublue images build.
+    - cron: "00 06 * * *"
+
+  push:
+    branches:
+      - main
+    
+    paths-ignore:
+      - '**.md'
+      # Modification: Not ignoring txt files.
+
+env:
+  # Modification: IMAGE_BASE_NAME is not defined here as we will later find that on our own.
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
+
+jobs:
+  # Modification: this was originally called push-ghcr
+  makeContainers:
+    # Modification: This was originally called "Build and push image."
+    name: joscfg_imagebuildMkImages
+    # Modification: Use latest ubuntu.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+
+        # Reference the system name as it's stored in systems/.
+        # As an example, we have a base.ts file in systems/.
+        # We can reference that and it will be built.
+        # Modification: image_name was changed to systems and major_version and include was removed.
+        systems: [
+          base.ts
+        ]
+          
+
+    steps:
+      - name: Pull repo
+        uses: actions/checkout@v3
+
+      # -- Start modifications --
+      - name: Setup bun
+        run: curl -fsSL https://bun.sh/install | bash
+
+      - name: Install Dependencies
+        run: bun i
+
+      - name: Get image base name.
+        run: echo "IMAGE_BASE_NAME=$(bun run ./src/lib/joscfg-ostree-make/Examine_Imagename.ts --fileName {{matrix.systems}})" >> $GITHUB_ENV
+
+      - name: Get image major version.
+        run: echo "MAJOR_VERSION=$(bun run ./src/lib/joscfg-ostree-make/Examine_Majorversion.ts --fileName {{matrix.systems}})" >> $GITHUB_ENV
+
+      - name: Get image description.
+        run: echo "DESCRIPTION=$(bun run ./src/lib/joscfg-ostree-make/Examine_Description.ts --fileName {{matrix.systems}})" >> $GITHUB_ENV
+
+      - name: Build Containerfile
+        run: bun run ./src/lib/joscfg-ostree-make/makeFromParam.ts --fileName {{ matrix.systems }}
+
+      # -- End Modifications --
+
+
+      - name: Matrix vars
+        run: |
+          echo "IMAGE_NAME=${{ format('{1}', matrix.image_name, env.IMAGE_BASE_NAME) }}" >> $GITHUB_ENV
+
+      - name: Generate tags
+        id: generate-tags
+        shell: bash
+        run: |
+          # Generate a timestamp for creating an image version history
+          TIMESTAMP="$(date +%Y%m%d)"
+          # Modification: Make this read from env instead.
+          MAJOR_VERSION="${{ env.MAJOR_VERSION }}"
+          COMMIT_TAGS=()
+          BUILD_TAGS=()
+          # Have tags for tracking builds during pull request
+          SHA_SHORT="$(git rev-parse --short HEAD)"
+          COMMIT_TAGS+=("pr-${{ github.event.number }}-${MAJOR_VERSION}")
+          COMMIT_TAGS+=("${SHA_SHORT}-${MAJOR_VERSION}")
+          if [[ "${{ matrix.is_latest_version }}" == "true" ]] && \
+             [[ "${{ matrix.is_stable_version }}" == "true" ]]; then
+              COMMIT_TAGS+=("pr-${{ github.event.number }}")
+              COMMIT_TAGS+=("${SHA_SHORT}")
+          fi
+
+          BUILD_TAGS=("${MAJOR_VERSION}" "${MAJOR_VERSION}-${TIMESTAMP}")
+
+          if [[ "${{ matrix.is_latest_version }}" == "true" ]] && \
+             [[ "${{ matrix.is_stable_version }}" == "true" ]]; then
+              BUILD_TAGS+=("${TIMESTAMP}")
+              BUILD_TAGS+=("latest")
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              echo "Generated the following commit tags: "
+              for TAG in "${COMMIT_TAGS[@]}"; do
+                  echo "${TAG}"
+              done
+              alias_tags=("${COMMIT_TAGS[@]}")
+          else
+              alias_tags=("${BUILD_TAGS[@]}")
+          fi
+          echo "Generated the following build tags: "
+          for TAG in "${BUILD_TAGS[@]}"; do
+              echo "${TAG}"
+          done
+          echo "alias_tags=${alias_tags[*]}" >> $GITHUB_OUTPUT
+
+      - name: Make image metadata
+        uses: docker/metadata-action@v4
+        id: meta
+        with:
+          images: |
+            ${{ env.IMAGE_NAME }}
+
+          # Modification: Remove two labels that we can't determine... or atleast i don't think we can.
+          labels: |
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+            org.opencontainers.image.description=${{ env.DESCRIPTION }}
+
+      - name: Make image
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./Containerfile
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ steps.generate-tags.outputs.alias_tags }}
+
+          # Modification: Make FEDORA_MAJOR_VERSION use env instead.
+          build-args: |
+            IMAGE_NAME=${{ matrix.image_name }}
+            FEDORA_MAJOR_VERSION=${{ env.MAJOR_VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+          oci: false
+
+      - name: Lowercase Registry
+        id: registry_case
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ env.IMAGE_REGISTRY }}
+
+      - name: Push To GHCR
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        if: github.event_name != 'pull_request'
+        env:
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_PASSWORD: ${{ github.token }}
+        with:
+          image: ${{ steps.build_image.outputs.image }}
+          tags: ${{ steps.build_image.outputs.tags }}
+          registry: ${{ steps.registry_case.outputs.lowercase }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+          extra-args: |
+            --disable-content-trust
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: sigstore/cosign-installer@v3.0.3
+        if: github.event_name != 'pull_request'
+
+      # Temporary Modification: Don't sign the container!
+      # THIS IS TEMPORARY. AND SHOULD BE REMOVED ONCE THIS THING ACTUALLY BUILDS
+      # SUCCESSFULLY!
+
+      #- name: Sign container image
+        #if: github.event_name != 'pull_request'
+        #run: |
+          #echo "${{ env.COSIGN_PRIVATE_KEY }}" > cosign.key
+          #wc -c cosign.key
+          #cosign sign -y --key cosign.key ${{ steps.registry_case.outputs.lowercase }}/${{ env.IMAGE_NAME }}@${TAGS}
+        #env:
+          #TAGS: ${{ steps.push.outputs.digest }}
+          #COSIGN_EXPERIMENTAL: false
+          #COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+
+      - name: Echo outputs
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "${{ toJSON(steps.push.outputs) }}"
