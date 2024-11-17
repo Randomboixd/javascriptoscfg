@@ -95,6 +95,87 @@ Now go into your github repository, go to settings, Secrets and variables, Actio
 
 Congrats! You just set up signing! Now commit that cosign.pub and let it override mine. That's it! You're now signing containers!
 
-### to be continued
+### Declaring a "System"
 
-Currently this readme is still in the making.
+Now when you created your clone of the template, you got one system in the systems folder, that's called `base.ts`!
+
+It aims to demonstrate what it can do. You can delete that and follow along.
+
+So Systems are an instance of the System class by `joscfg-ostree`. You make a new instance of them, and then apply Derivations on top of it to modify the system.
+
+Let me get into the details.
+
+```ts
+import System from "../src/lib/joscfg-ostree/System";
+
+
+export const system = new System()
+   .setChannel("ghcr.io/ublue-os/silverblue-main", "41")
+   .setPublishedImageConfig("my-first-image", "Hello, World!")
+```
+
+This file **exports** *([Read MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export))* a **constant** system variable *([Read MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const))* called system.
+
+This is then grabbed by the `joscfg-ostree` Builder to make a Containerfile.
+
+Basically, tells the builder that this is a system.
+
+We then use the .setChannel() with the channel that we want to use. 
+
+
+> [!NOTE]
+> A channel in javascript os config is a image that we are building upon. Your IDE Should recommend a few ones, but you are free to base your image on top of anything!
+
+We also use the second parameter to select 41 as the version. This is **COMPLETELY** optional. Just leave it and it will use the absolute latest version.
+
+> [!WARNING]
+> If you are going to stick with an older image, remember that Fedora supports releases for approx 13 months. And since they release a new one every 6 months, meaning if you base your release on Fedora 40 for example, you'll get package updates till Fedora 42 and one more month. Keep up with updates if possible. If you don't think you can handle this, use "latest"
+
+Then we configure the **published image configuration**. The first parameter is the **image name**, as it's going to be published on the **GHCR** (Github Container Registry). Then the **description**, which can be mostly anything... just explain your image in a few words. That should do it!
+
+Congratulations! You just created your own imag- oh wait... right we have to add it to our workflows.
+
+In your IDE, find the `.github` folder, and then enter `workflows`. Open that build-images.yml file and look for something like:
+
+```yaml
+systems:
+   - base.ts
+```
+
+Here is where we mention our system. Let's say we named our system's **FILENAME** to `first.ts`, we gotta add first.ts to the array. By creating a new line and adding it like `- first.ts`. Also let's remove `- base.ts` since we don't wanna build a non existent system (Recap: We just deleted it. if you remember)!
+
+> [!CAUTION]
+> Identation matters! Especially in YAML! Use tabs. It takes **5** tabs to reach systems and add a new entry!
+
+> [!CAUTION]
+> Additionally, Javascript OS Config expects systems to be in systems/ **NO MATTER WHAT.** There is no arguing with the builder! So you don't need to write a large paragraph to the system file. Just enter it's filename and call it a day!
+
+Now we can truly create image! Add both the build-images.yml and system to git, and commit them, then push them.
+
+Now visit github workflows, click the workflow and pray that it builds... if it did...
+
+🎉 **YOU DID IT!** 🎉
+
+Now you can rebase to it by running:
+```bash
+rpm-ostree rebase unverified-ostree-registry:ghcr.io/(Your github username)/(name of your container as defined in setPublishedImageConfig):(the version number you are using for your own image. Since this uses fedora 41, you should use 41)
+```
+> [!WARNING]
+> If your github repository is private, then you must manually set the container package to public for `rpm-ostree` to see it.
+
+
+You should have a command like this:
+
+```bash
+rpm-ostree rebase unverified-ostree-registry:ghcr.io/randomboixd/testimage:40
+```
+
+Do so and you may recieve a prompt to enter your password. do so!
+
+and congrats! You are now running your own container... well you will once you restart.
+
+... But we literally just copied fedora silverblue 41... ugh that's not too special.
+
+### Deriving from the base channel using Derivations
+
+... to be continued.
