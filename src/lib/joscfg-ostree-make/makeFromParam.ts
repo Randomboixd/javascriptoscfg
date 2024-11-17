@@ -8,7 +8,8 @@ const { values } = parseArgs({
             type: 'string'
         }
     },
-    strict: true
+    strict: true,
+    allowPositionals: true
 })
 
 if (typeof values.fileName !== "string") {

@@ -76,19 +76,19 @@ jobs:
 
       - name: Get image base name.
         run: |
-          echo "IMAGE_BASE_NAME=$(bun run ./src/lib/joscfg-ostree-make/Examine_Imagename.ts --fileName {{matrix.systems}})" >> $GITHUB_ENV
+          echo "IMAGE_BASE_NAME=$(bun run ./src/lib/joscfg-ostree-make/Examine_Imagename.ts --fileName ${{matrix.systems}})" >> $GITHUB_ENV
 
       - name: Get image major version.
         run: |
-          echo "MAJOR_VERSION=$(bun run ./src/lib/joscfg-ostree-make/Examine_Majorversion.ts --fileName {{matrix.systems}})" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=$(bun run ./src/lib/joscfg-ostree-make/Examine_Majorversion.ts --fileName ${{matrix.systems}})" >> $GITHUB_ENV
 
       - name: Get image description.
         run: |
-          echo "DESCRIPTION=$(bun run ./src/lib/joscfg-ostree-make/Examine_Description.ts --fileName {{matrix.systems}})" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(bun run ./src/lib/joscfg-ostree-make/Examine_Description.ts --fileName ${{matrix.systems}})" >> $GITHUB_ENV
 
       - name: Build Containerfile
         run: |
-          bun run ./src/lib/joscfg-ostree-make/makeFromParam.ts --fileName {{ matrix.systems }}
+          bun run ./src/lib/joscfg-ostree-make/makeFromParam.ts --fileName ${{ matrix.systems }}
 
       # -- End Modifications --
 
