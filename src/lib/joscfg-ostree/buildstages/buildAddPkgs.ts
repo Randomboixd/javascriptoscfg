@@ -8,5 +8,5 @@ export default (image: System) => {
         addedPackagesString += `${p.name} `
     })
 
-    return `rpm-ostree override install ${addedPackagesString}`
+    return `rpm-ostree install ${addedPackagesString}`
 }
