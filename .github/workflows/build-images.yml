@@ -204,9 +204,14 @@ jobs:
 
       # Modification: Replace the environment variable's name with SIGN
       - name: Sign container image
-        if: github.event_name != 'pull_request' || env.SIGN != ''
+        if: github.event_name != 'pull_request'
         run: |
-          echo "${{ env.SIGN }}" > cosign.key
+          if [ -z "${{env.COSIGN_PRIVATE_KEY}}" ]; then
+            echo "Cannot sign image as SIGN is not set. Skipping! Albeit you should TOTALLY set up signing. Read Readme.md on what can happen if you don't!"
+            echo "Tldr; sans undertale"
+            exit 0
+          fi
+          echo "${{ env.COSIGN_PRIVATE_KEY }}" > cosign.key
           wc -c cosign.key
           cosign sign -y --key cosign.key ${{ steps.registry_case.outputs.lowercase }}/${{ env.IMAGE_NAME }}@${TAGS}
         env:
