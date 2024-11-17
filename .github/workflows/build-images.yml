@@ -202,20 +202,17 @@ jobs:
       - uses: sigstore/cosign-installer@v3.0.3
         if: github.event_name != 'pull_request'
 
-      # Temporary Modification: Don't sign the container!
-      # THIS IS TEMPORARY. AND SHOULD BE REMOVED ONCE THIS THING ACTUALLY BUILDS
-      # SUCCESSFULLY!
-
-      #- name: Sign container image
-        #if: github.event_name != 'pull_request'
-        #run: |
-          #echo "${{ env.COSIGN_PRIVATE_KEY }}" > cosign.key
-          #wc -c cosign.key
-          #cosign sign -y --key cosign.key ${{ steps.registry_case.outputs.lowercase }}/${{ env.IMAGE_NAME }}@${TAGS}
-        #env:
-          #TAGS: ${{ steps.push.outputs.digest }}
-          #COSIGN_EXPERIMENTAL: false
-          #COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+      # Modification: Replace the environment variable's name with SIGN
+      - name: Sign container image
+        if: github.event_name != 'pull_request' || env.SIGN != ''
+        run: |
+          echo "${{ env.SIGN }}" > cosign.key
+          wc -c cosign.key
+          cosign sign -y --key cosign.key ${{ steps.registry_case.outputs.lowercase }}/${{ env.IMAGE_NAME }}@${TAGS}
+        env:
+          TAGS: ${{ steps.push.outputs.digest }}
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.SIGN }}
 
       - name: Echo outputs
         if: github.event_name != 'pull_request'

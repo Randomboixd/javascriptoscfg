@@ -177,3 +177,6 @@ dist
 
 # temp
 temp
+
+# Don't include the built Containerfile!
+Containerfile
