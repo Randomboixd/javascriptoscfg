@@ -4,7 +4,7 @@ import path from "path";
 import os from "os";
 
 export default (shellScriptName: string, contents: string): Package => {
-    const pathToTemp = path.join(process.env.RUNNER_TEMP || os.tmpdir(), "javascriptoscfg")
+    const pathToTemp = path.join(process.cwd(), "temp")
 
     try {
         fs.mkdirSync(pathToTemp, { recursive: true })
@@ -13,10 +13,10 @@ export default (shellScriptName: string, contents: string): Package => {
     }
     
 
-    fs.writeFileSync(path.join(pathToTemp, shellScriptName), contents)
+    fs.writeFileSync(path.join(".", "temp", shellScriptName), contents)
 
     return {
         name: shellScriptName,
-        packageType: { type: "binary", src: path.join(pathToTemp, shellScriptName) }
+        packageType: { type: "binary", src: path.join(".", "temp", shellScriptName) }
     }
 }
