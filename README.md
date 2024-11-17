@@ -27,7 +27,7 @@ Here is what i changed:
 4. **Metadata changes**:
    - Removed static metadata labels in favor of dynamic values generated from `Examine-(value).ts` files.
 
-If you want to see the EXACT changes. I invite you to look at the `.github/workflow/build.yml` file. I marked EVERY modification there. Or atleast i hope i got all.
+If you want to see the EXACT changes. I invite you to look at the `.github/workflow/make-images.yml` file. I marked EVERY modification there. Or atleast i hope i got all.
 
 Remember i am **NOT** a lawyer, and my knowledge in licenses is basically: "oooh mit license. wow. why not" and i am certain that i missed a little detail. Please make an issue or pull request if i did.
 
