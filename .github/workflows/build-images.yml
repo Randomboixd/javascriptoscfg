@@ -58,9 +58,8 @@ jobs:
         # As an example, we have a base.ts file in systems/.
         # We can reference that and it will be built.
         # Modification: image_name was changed to systems and major_version and include was removed.
-        systems: [
-          base.ts
-        ]
+        systems:
+          - base.ts
           
 
     steps:
