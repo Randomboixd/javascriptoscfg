@@ -3,6 +3,7 @@ import type Package from "./types/Package";
 import type Channels from "./types/Channels";
 import type Published from "./types/Published";
 import type { Versions } from "./types/Channels";
+import type GSchemaSet from "./types/GSchema";
 
 export default class System {
 
@@ -17,6 +18,7 @@ export default class System {
     public packages: Package[] = []
     public COPY: { from: string, to: string }[] = []
     public executeCommands: string[] = []
+    public gschemas: GSchemaSet[] = []
 
     constructor() {
 

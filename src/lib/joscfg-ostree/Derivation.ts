@@ -1,5 +1,6 @@
 import type Package from "./types/Package";
 import type System from "./System";
+import type GSchemaSet from "./types/GSchema";
 
 
 export default class Derivation {
@@ -7,9 +8,24 @@ export default class Derivation {
     private packages: Package[] = []
     private COPYInstructions: { from: string, to: string }[] = []
     private commandExecutions: string[] = []
+    private GSchemas: GSchemaSet[] = []
 
     constructor(image: System) {
         this.image = image
+    }
+
+    /**
+     * Add GSchema overrides to your system! This allows you to set extensions to be enabled automatically,
+     * accent colors to be picked, or a icon theme to be enabled automatically!
+     * 
+     * 
+     * Recommended helper to use: Schema()
+     * @param gschemas An array of Schema() returned values.
+     * @returns The derivation object. so you can chain things together.
+     */
+    public addGSchemas(gschemas: GSchemaSet[]): Derivation {
+        gschemas.forEach(gs => this.GSchemas.push(gs))
+        return this
     }
 
     /**
@@ -65,5 +81,6 @@ export default class Derivation {
 
         this.COPYInstructions.forEach(c => this.image.COPY.push(c))
         this.commandExecutions.forEach(ce => this.image.executeCommands.push(ce))
+        this.GSchemas.forEach(gs => this.image.gschemas.push(gs))
     }
 }

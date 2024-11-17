@@ -1,5 +1,5 @@
 import Package from "../src/lib/joscfg-ostree/helpers/Package";
-import writeShellScriptBin from "../src/lib/joscfg-ostree/helpers/writeShellScriptBin";
+import Schema from "../src/lib/joscfg-ostree/helpers/Schema";
 import System from "../src/lib/joscfg-ostree/System";
 
 
@@ -9,11 +9,11 @@ export const system = new System()
     .makeDerivation(d => d
         .addPackages([
             Package("fastfetch"),
-            writeShellScriptBin('test', 
-                `
-                echo 'hello world'
-                `
-            )
+        ])
+        .addGSchemas([
+            Schema("org.gnome.shell", {
+                "enabled-extensions": [ "blur-my-shell@aunetx" ] // Currently there is no way to install gnome extensions yet... I will add it though!
+            })
         ])
         .applyDerivation()
     )
