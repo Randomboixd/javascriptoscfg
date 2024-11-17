@@ -4,11 +4,13 @@ import path from "path";
 import os from "os";
 
 export default (shellScriptName: string, contents: string): Package => {
-    const pathToTemp = path.join(__dirname, "..", "..", "..", "..", "temp")
+    const pathToTemp = path.join(process.env.RUNNER_TEMP || os.tmpdir(), "javascriptoscfg")
 
     try {
-        fs.mkdirSync(pathToTemp)
-    } catch {}
+        fs.mkdirSync(pathToTemp, { recursive: true })
+    } catch (e) {
+        console.error(`Making temp dir failed: ${e}`)
+    }
     
 
     fs.writeFileSync(path.join(pathToTemp, shellScriptName), contents)
