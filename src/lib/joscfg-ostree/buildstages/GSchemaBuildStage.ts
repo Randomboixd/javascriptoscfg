@@ -68,5 +68,5 @@ export default (image: System) => {
 
 
     console.log("Compilation happens during Containerfile build... Meaning we'll hope that everything here is alright. Here be dragons!")
-    return `RUN glib-compile-schemas --strict --targetdir=./temp/schemas-target/ ./temp/schemas/\nCOPY ${compiledTarget}/* /usr/share/glib-2.0/schemas/`
+    return `RUN tree\nRUN glib-compile-schemas --strict --targetdir=./temp/schemas-target/ ./temp/schemas/\nCOPY ${compiledTarget}/* /usr/share/glib-2.0/schemas/`
 }
