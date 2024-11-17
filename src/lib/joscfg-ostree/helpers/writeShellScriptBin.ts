@@ -4,7 +4,7 @@ import path from "path";
 import os from "os";
 
 export default (shellScriptName: string, contents: string): Package => {
-    const pathToTemp = path.join(os.tmpdir(), "shellScriptBuilds")
+    const pathToTemp = path.join(process.env.RUNNER_TEMP || os.tmpdir(), "shellScriptBuilds")
 
     try {
         fs.mkdirSync(pathToTemp)
