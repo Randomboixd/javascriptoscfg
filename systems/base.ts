@@ -15,6 +15,5 @@ export const system = new System()
                 `
             )
         ])
-        .COPY("./README.md", "/")
         .applyDerivation()
     )
