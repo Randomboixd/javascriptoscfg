@@ -1,5 +1,6 @@
 import Package from "../src/lib/joscfg-ostree/helpers/Package";
 import Schema from "../src/lib/joscfg-ostree/helpers/Schema";
+import writeShellScriptBin from "../src/lib/joscfg-ostree/helpers/writeShellScriptBin";
 import System from "../src/lib/joscfg-ostree/System";
 
 
@@ -9,6 +10,7 @@ export const system = new System()
     .makeDerivation(d => d
         .addPackages([
             Package("fastfetch"),
+            writeShellScriptBin('test', `echo 'huh'`)
         ])
         .addGSchemas([
             Schema("org.gnome.shell", {
