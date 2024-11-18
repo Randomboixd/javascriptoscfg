@@ -95,6 +95,10 @@ jobs:
         run: |
           bun run ./src/lib/joscfg-ostree-make/makeFromParam.ts --fileName ${{ matrix.systems }}
 
+      - name: Unique Build ID
+        run: |
+          curl "BUILDID=$(openssl rand -base64 6)" >> $GITHUB_ENV
+
       # -- End Modifications --
 
 
@@ -129,6 +133,9 @@ jobs:
               BUILD_TAGS+=("${TIMESTAMP}")
               BUILD_TAGS+=("latest")
           fi
+
+          # Modification: Tag versions using a random build id. So users can stay on an older version of an image
+          BUILD_TAGS+=("$BUILDID")
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "Generated the following commit tags: "
