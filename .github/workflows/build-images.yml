@@ -97,7 +97,7 @@ jobs:
 
       - name: Unique Build ID
         run: |
-          curl "BUILDID=$(openssl rand -base64 6)" >> $GITHUB_ENV
+          echo "BUILDID=$(openssl rand -base64 6)" >> $GITHUB_ENV
 
       # -- End Modifications --
 
