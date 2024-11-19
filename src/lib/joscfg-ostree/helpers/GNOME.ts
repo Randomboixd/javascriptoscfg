@@ -79,7 +79,7 @@ export default (versionNumber: number) => {
 
             return {
                 uuid: extensionListing.uuid,
-                src: path.join(pathToGEExtract, extensionListing.uuid)
+                src: `temp/GEEXTRACT/${extensionListing.uuid}`
             }
         }
     }
