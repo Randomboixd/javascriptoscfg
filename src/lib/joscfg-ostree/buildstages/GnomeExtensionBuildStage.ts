@@ -9,7 +9,8 @@ export default (image: System) => {
     let copyString: string = ""
 
     image.gnomeExtensions.forEach(ex => {
-        copyString += `COPY ${ex.src} /usr/share/gnome-shell/extensions/\n`
+        console.log(ex)
+        copyString += `RUN mkdir /usr/share/gnome-shell/extensions/${ex.uuid}\nCOPY ${ex.src}/* /usr/share/gnome-shell/extensions/${ex.uuid}/\n`
     })
 
     return copyString

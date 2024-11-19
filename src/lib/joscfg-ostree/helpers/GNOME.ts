@@ -65,15 +65,17 @@ export default (versionNumber: number) => {
 
             const extensionDownloadNoVirus100percentLegit = `${extensionListing.uuid.replaceAll('@', '')}.v${extensionVersionThingyBasicallyYes.version}.shell-extension.zip`
 
-            if (fs.existsSync(`${path.join(pathToGE, extensionDownloadNoVirus100percentLegit)}`)) {
-                execSync(`rm ${pathToGE}/${extensionDownloadNoVirus100percentLegit}`)
+            if (fs.existsSync(path.join(pathToGE, extensionListing.uuid))) {
+                execSync(`rm ${path.join(pathToGE, extensionListing.uuid)}`)
             }
 
             console.log(`Downloading ${extensionDownloadNoVirus100percentLegit}`)
-            const downloadResults = execSync(`curl https://extensions.gnome.org/extension-data/${extensionDownloadNoVirus100percentLegit} >> ${pathToGE}/${extensionListing.uuid}`)
+            const downloadResults = execSync(`curl https://extensions.gnome.org/extension-data/${extensionDownloadNoVirus100percentLegit} >> ${path.join(pathToGE, extensionListing.uuid)}`)
 
             console.log(`Extracting to temp/GEEXTRACT/${extensionListing.uuid}`)
-            const extractResults = execSync(`unzip -u ${pathToGE}/${extensionListing.uuid} -d ${pathToGEExtract}/${extensionListing.uuid}`)
+            const extractResults = execSync(`unzip -u ${pathToGE}/${extensionListing.uuid} -d ${path.join(pathToGEExtract, extensionListing.uuid)}`)
+            
+            console.log(execSync("tree ./temp").toString())
 
             return {
                 uuid: extensionListing.uuid,
