@@ -68,10 +68,10 @@ jobs:
 
       # -- Start modifications --
       
-      - name: Update package list and install libglib2.0-bin
+      - name: Update package list and install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libglib2.0-bin
+          sudo apt-get install -y libglib2.0-bin unzip
 
       - uses: oven-sh/setup-bun@v2
 

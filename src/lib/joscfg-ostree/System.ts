@@ -4,6 +4,7 @@ import type Channels from "./types/Channels";
 import type Published from "./types/Published";
 import type { Versions } from "./types/Channels";
 import type GSchemaSet from "./types/GSchema";
+import type GnomeExtensions from "./types/GnomeExtensions";
 
 export default class System {
 
@@ -19,6 +20,7 @@ export default class System {
     public COPY: { from: string, to: string }[] = []
     public executeCommands: string[] = []
     public gschemas: GSchemaSet[] = []
+    public gnomeExtensions: GnomeExtensions[] = []
 
     constructor() {
 
