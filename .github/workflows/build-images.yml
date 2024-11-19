@@ -60,6 +60,7 @@ jobs:
         # Modification: image_name was changed to systems and major_version and include was removed.
         systems:
           - base.ts
+          - dogFood.ts
           
 
     steps:
