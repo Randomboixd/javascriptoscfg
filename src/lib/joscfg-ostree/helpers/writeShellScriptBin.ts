@@ -13,7 +13,7 @@ export default (shellScriptName: string, contents: string): Package => {
     }
     
 
-    fs.writeFileSync(path.join(".", "temp", shellScriptName), contents)
+    fs.writeFileSync(path.join(".", "temp", "#!/bin/bash\n"+shellScriptName), contents)
 
     return {
         name: shellScriptName,
