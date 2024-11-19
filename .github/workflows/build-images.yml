@@ -97,7 +97,8 @@ jobs:
 
       - name: Unique Build ID
         run: |
-          echo "BUILDID=$(openssl rand -base64 6)" >> $GITHUB_ENV
+          # Thank you person on stack overflow: https://unix.stackexchange.com/a/230676
+          echo "BUILDID=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13; echo)" >> $GITHUB_ENV
 
       - name: Create .ready File
         run: |
