@@ -10,7 +10,7 @@ export default (image: System) => {
 
     image.gnomeExtensions.forEach(ex => {
         console.log(ex)
-        copyString += `RUN mkdir /usr/share/gnome-shell/extensions/${ex.uuid}\nCOPY ${ex.src}/* /usr/share/gnome-shell/extensions/${ex.uuid}/\n`
+        copyString += `RUN mkdir /usr/share/gnome-shell/extensions/${ex.uuid}\nCOPY --chmod="+wx" ${ex.src}/* /usr/share/gnome-shell/extensions/${ex.uuid}/\n`
     })
 
     return copyString
