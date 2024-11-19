@@ -99,6 +99,10 @@ jobs:
         run: |
           echo "BUILDID=$(openssl rand -base64 6)" >> $GITHUB_ENV
 
+      - name: Create .ready File
+        run: |
+          echo "ok" > .ready
+
       # -- End Modifications --
 
 
