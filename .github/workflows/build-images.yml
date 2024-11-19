@@ -67,6 +67,10 @@ jobs:
         uses: actions/checkout@v3
 
       # -- Start modifications --
+
+      - name: jumpscare # idk just thought i should add this as a step
+        run: |
+          echo "boo"
       
       - name: Update package list and install dependencies
         run: |
@@ -93,16 +97,12 @@ jobs:
 
       - name: Build Containerfile
         run: |
-          bun run ./src/lib/joscfg-ostree-make/makeFromParam.ts --fileName ${{ matrix.systems }}
+          JOS_READY="true" bun run ./src/lib/joscfg-ostree-make/makeFromParam.ts --fileName ${{ matrix.systems }}
 
       - name: Unique Build ID
         run: |
           # Thank you person on stack overflow: https://unix.stackexchange.com/a/230676
           echo "BUILDID=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13; echo)" >> $GITHUB_ENV
-
-      - name: Create .ready File
-        run: |
-          echo "ok" > .ready
 
       # -- End Modifications --
 
