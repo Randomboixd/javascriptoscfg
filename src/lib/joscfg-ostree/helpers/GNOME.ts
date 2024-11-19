@@ -73,7 +73,7 @@ export default (versionNumber: number) => {
             const downloadResults = execSync(`curl https://extensions.gnome.org/extension-data/${extensionDownloadNoVirus100percentLegit} >> ${path.join(pathToGE, extensionListing.uuid)}`)
 
             console.log(`Extracting to temp/GEEXTRACT/${extensionListing.uuid}`)
-            const extractResults = execSync(`unzip -u ${pathToGE}/${extensionListing.uuid} -d ${path.join(pathToGEExtract, extensionListing.uuid)}`)
+            const extractResults = execSync(`unzip ${pathToGE}/${extensionListing.uuid} -d ${path.join(pathToGEExtract, extensionListing.uuid)}`)
             
             console.log(execSync("tree ./temp").toString())
 
