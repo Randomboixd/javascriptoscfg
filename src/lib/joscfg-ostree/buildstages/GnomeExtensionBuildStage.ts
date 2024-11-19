@@ -9,7 +9,7 @@ export default (image: System) => {
     let copyString: string = ""
 
     image.gnomeExtensions.forEach(ex => {
-        copyString += `COPY ${ex.src}/* /usr/share/gnome-shell/extensions/${ex.uuid}/\n`
+        copyString += `COPY ${ex.src}/ /usr/share/gnome-shell/extensions/\n`
     })
 
     return copyString
