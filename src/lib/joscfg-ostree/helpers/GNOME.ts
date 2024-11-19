@@ -12,7 +12,7 @@ export default (versionNumber: number) => {
         GetGnomeExtension: (name: string, packageId?: number) => {
 
             if (!fs.existsSync(path.join(process.cwd(), ".ready"))) {
-                console.log("Javascript OS Config is NOT YET ready to download Gnome extensions. Leave me alone!")
+                // Javascript OS Config is NOT YET ready to download Gnome extensions. Leave me alone!
                 return {
                     uuid: "Nothing",
                     src: ""
