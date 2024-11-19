@@ -70,10 +70,10 @@ export default (versionNumber: number) => {
             }
 
             console.log(`Downloading ${extensionDownloadNoVirus100percentLegit}`)
-            const downloadResults = execSync(`curl https://extensions.gnome.org/extension-data/${extensionDownloadNoVirus100percentLegit} >> ${pathToGE}/${extensionDownloadNoVirus100percentLegit}`)
+            const downloadResults = execSync(`curl https://extensions.gnome.org/extension-data/${extensionDownloadNoVirus100percentLegit} >> ${pathToGE}/${extensionListing.uuid}`)
 
             console.log(`Extracting to temp/GEEXTRACT/${extensionListing.uuid}`)
-            const extractResults = execSync(`unzip -u ${pathToGE}/${extensionDownloadNoVirus100percentLegit} -d ${pathToGEExtract}/${extensionListing.uuid}`)
+            const extractResults = execSync(`unzip -u ${pathToGE}/${extensionListing.uuid} -d ${pathToGEExtract}/${extensionListing.uuid}`)
 
             return {
                 uuid: extensionListing.uuid,
