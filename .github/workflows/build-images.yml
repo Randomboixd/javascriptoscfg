@@ -172,6 +172,8 @@ jobs:
       - name: Make image
         id: build_image
         uses: redhat-actions/buildah-build@v2
+        env:
+          DOCKER_BUILDKIT: 1
         with:
           containerfiles: |
             ./Containerfile

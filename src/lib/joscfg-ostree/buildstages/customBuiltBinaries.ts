@@ -11,7 +11,7 @@ export default (image: System) => {
     let result: string = ""
     customPkgs.forEach(p => {
         if (p.packageType.type !== "binary") return
-        result += `# Copy custom binary '${p.name}' to /usr/bin\nCOPY --chmod='+x' ${p.packageType.src} /usr/bin/\n`
+        result += `# Copy custom binary '${p.name}' to /usr/bin\nCOPY --chmod=+x ${p.packageType.src} /usr/bin/\n`
     })
     return result
 }
