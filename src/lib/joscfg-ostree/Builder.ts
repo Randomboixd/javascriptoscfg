@@ -6,6 +6,7 @@ import customBuiltBinaries from "./buildstages/customBuiltBinaries";
 import ExecStage from "./buildstages/ExecStage";
 import GnomeExtensionBuildStage from "./buildstages/GnomeExtensionBuildStage";
 import GSchemaBuildStage from "./buildstages/GSchemaBuildStage";
+import LooseChannelsBuildStage from "./buildstages/LooseChannelsBuildStage";
 import mkImageHeaders from "./buildstages/mkImageHeaders";
 import mkImageLabels from "./buildstages/mkImageLabels";
 import type System from "./System";
@@ -44,7 +45,8 @@ export default class Builder {
         const labels = mkImageLabels(this.image)
         const schemas = GSchemaBuildStage(this.image)
         const extensions = GnomeExtensionBuildStage(this.image)
+        const looseChannels = LooseChannelsBuildStage(this.image)
     
-        return `${imageHeaders}\n# Add image labels\n${labels}\n \n# Copy stage\n${COPY}\n \n# Custom binaries stage\n${customBinaries}\n \n# Install/Remove packages\n${removePkgsCommand}\n${addPkgsCommand}\n \n# Execution stage\n${run}\n \n# GSchema Stage\n${schemas} \n \n#GNOME Extension stage\n${extensions}\n \n# Commit everything\nRUN ${Commit()}\n# Goodbye!`.trim();
+        return `${imageHeaders}\n# Add image labels\n${labels}\n# Add loose channels\n${looseChannels}\n# Copy stage\n${COPY}\n \n# Custom binaries stage\n${customBinaries}\n \n# Install/Remove packages\n${removePkgsCommand}\n${addPkgsCommand}\n \n# Execution stage\n${run}\n \n# GSchema Stage\n${schemas} \n \n#GNOME Extension stage\n${extensions}\n \n# Commit everything\nRUN ${Commit()}\n# Goodbye!`.trim();
     }
 }

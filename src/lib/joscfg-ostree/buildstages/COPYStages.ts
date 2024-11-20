@@ -11,7 +11,7 @@ export default (image: System) => {
     let copyInString: string = ""
 
     COPYInstructions.forEach(copy => {
-        copyInString += `# Copy ${copy.from} to ${copy.to}\nCOPY ${copy.from} ${copy.to}\n`
+        copyInString += `# Copy ${copy.channel ? '(From loose channel)': ''} ${copy.from} to ${copy.to}\nCOPY ${copy.channel ? `--from=${copy.channel} ` : ' '}${copy.from} ${copy.to}\n`
     })
 
     return copyInString

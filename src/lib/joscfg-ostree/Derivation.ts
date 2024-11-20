@@ -2,12 +2,13 @@ import type Package from "./types/Package";
 import type System from "./System";
 import type GSchemaSet from "./types/GSchema";
 import type GnomeExtensions from "./types/GnomeExtensions";
+import type LooseChannel from "./types/LooseChannel";
 
 
 export default class Derivation {
     private image: System
     private packages: Package[] = []
-    private COPYInstructions: { from: string, to: string }[] = []
+    private COPYInstructions: { from: string, to: string, channel?: string }[] = []
     private commandExecutions: string[] = []
     private GSchemas: GSchemaSet[] = []
     private GnomeExtensions: GnomeExtensions[] = []
@@ -30,7 +31,12 @@ export default class Derivation {
         return this
     }
 
-    public includeGnomeExtensions(extensions: any[]): Derivation {
+    /**
+     * Include GNOME Extensions with your image!
+     * @param extensions An array of Gnome Extensions. To get this, call GNOME() with the version number of your GNOME install, then use it's .GetGnomeExtension() method!
+     * @returns The derivation object. so you can chain things together.
+     */
+    public includeGnomeExtensions(extensions: GnomeExtensions[]): Derivation {
         extensions.forEach(ex => this.GnomeExtensions.push(ex))
         return this
     }
@@ -60,6 +66,18 @@ export default class Derivation {
      */
     public COPY(from: string, to: string): Derivation {
         this.COPYInstructions.push({ from, to })
+        return this
+    }
+
+    /**
+     * Loose Copying allows for Efficient CTRL + V! Define from where, and to where to copy something. Simple as that.
+     * @param channel An instance of LooseChannel. Call LooseChannel() to set up a loose channel, then in your System, add .addLooseChannels to register the channel!
+     * @param from From where?
+     * @param to To where?
+     * @returns The derivation object. so you can chain things together.
+     */
+    public LOOSECOPY(channel: LooseChannel, from: string, to: string): Derivation {
+        this.COPYInstructions.push({ from, to, channel: channel.channelRandomString })
         return this
     }
 

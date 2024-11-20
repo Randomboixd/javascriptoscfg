@@ -15,7 +15,8 @@ export default (versionNumber: number) => {
                 // Javascript OS Config is NOT YET ready to download Gnome extensions. Leave me alone!
                 return {
                     uuid: "Nothing",
-                    src: ""
+                    src: "",
+                    needsCompileSchemas: false
                 }
             }
 

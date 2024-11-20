@@ -5,6 +5,7 @@ import type Published from "./types/Published";
 import type { Versions } from "./types/Channels";
 import type GSchemaSet from "./types/GSchema";
 import type GnomeExtensions from "./types/GnomeExtensions";
+import type LooseChannel from "./types/LooseChannel";
 
 export default class System {
 
@@ -17,10 +18,11 @@ export default class System {
     }
 
     public packages: Package[] = []
-    public COPY: { from: string, to: string }[] = []
+    public COPY: { from: string, to: string, channel?: string }[] = []
     public executeCommands: string[] = []
     public gschemas: GSchemaSet[] = []
     public gnomeExtensions: GnomeExtensions[] = []
+    public looseChannels: LooseChannel[] = []
 
     constructor() {
 
@@ -38,6 +40,11 @@ export default class System {
             channelVersion: this.channelVersion,
             publish: this.published,
         }
+    }
+
+    public addLooseChannels(looseChannels: LooseChannel[]): System {
+        looseChannels.forEach(lc => this.looseChannels.push(lc))
+        return this
     }
 
     /**
