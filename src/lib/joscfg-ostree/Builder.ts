@@ -47,6 +47,6 @@ export default class Builder {
         const extensions = GnomeExtensionBuildStage(this.image)
         const looseChannels = LooseChannelsBuildStage(this.image)
     
-        return `${imageHeaders}\n# Add image labels\n${labels}\n# Add loose channels\n${looseChannels}\n# Copy stage\n${COPY}\n \n# Custom binaries stage\n${customBinaries}\n \n# Install/Remove packages\n${removePkgsCommand}\n${addPkgsCommand}\n \n# Execution stage\n${run}\n \n# GSchema Stage\n${schemas} \n \n#GNOME Extension stage\n${extensions}\n \n# Commit everything\nRUN ${Commit()}\n# Goodbye!`.trim();
+        return `${imageHeaders}\n# Add image labels\n${labels}\n# Add loose channels\n${looseChannels}\n# Copy stage\nFROM base\n${COPY}\n \n# Custom binaries stage\n${customBinaries}\n \n# Install/Remove packages\n${removePkgsCommand}\n${addPkgsCommand}\n \n# Execution stage\n${run}\n \n# GSchema Stage\n${schemas} \n \n#GNOME Extension stage\n${extensions}\n \n# Commit everything\nRUN ${Commit()}\n# Goodbye!`.trim();
     }
 }
