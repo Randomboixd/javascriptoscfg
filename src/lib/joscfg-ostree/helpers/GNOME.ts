@@ -77,9 +77,12 @@ export default (versionNumber: number) => {
             
             console.log(execSync("tree ./temp").toString())
 
+            const hasSchemas = fs.existsSync(`temp/GEEXTRACT/${extensionListing.uuid}/schemas`) && !fs.existsSync(`temp/GEEXTRACT/${extensionListing.uuid}/schemas/gschemas.compiled`)
+
             return {
                 uuid: extensionListing.uuid,
-                src: `temp/GEEXTRACT/${extensionListing.uuid}`
+                src: `temp/GEEXTRACT/${extensionListing.uuid}`,
+                needsCompileSchemas: hasSchemas
             }
         }
     }
