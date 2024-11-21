@@ -2,6 +2,7 @@ import { system as baseSystem } from "./base"
 import GNOME from "../src/lib/joscfg-ostree/helpers/GNOME"
 import Package from "../src/lib/joscfg-ostree/helpers/Package"
 import LooseChannel from "../src/lib/joscfg-ostree/helpers/LooseChannel"
+import Repository from "../src/lib/joscfg-ostree/helpers/Repository"
 
 const gnome = GNOME(46)
 
@@ -21,7 +22,9 @@ export const system = baseSystem
             gnome.GetGnomeExtension("System Monitor", 6807)
         ])
         .addPackages([
-            Package("distrobox")
+            Repository("https://copr.fedorainfracloud.org/coprs/tmsp/xpadneo/repo/fedora-40/tmsp-xpadneo-fedora-40.repo"),
+            Package("distrobox"),
+            Package("xpadneo")
         ])
         .applyDerivation()
     )
