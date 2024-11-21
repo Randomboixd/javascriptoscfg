@@ -22,8 +22,10 @@ export const system = baseSystem
             gnome.GetGnomeExtension("System Monitor", 6807)
         ])
         .addPackages([
+            Repository("https://pkgs.tailscale.com/stable/fedora/39/tailscale.repo"),
             Package("distrobox"),
-            Package("xpadneo-kmod-common")
+            Package("xpadneo-kmod-common"),
+            Package("tailscale")
         ])
         .applyDerivation()
     )
