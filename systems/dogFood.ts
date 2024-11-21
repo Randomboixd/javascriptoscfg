@@ -22,7 +22,6 @@ export const system = baseSystem
             gnome.GetGnomeExtension("System Monitor", 6807)
         ])
         .addPackages([
-            Repository("https://copr.fedorainfracloud.org/coprs/tmsp/xpadneo/repo/fedora-40/tmsp-xpadneo-fedora-40.repo"),
             Package("distrobox"),
             Package("xpadneo")
         ])
