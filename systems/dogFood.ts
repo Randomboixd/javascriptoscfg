@@ -23,7 +23,7 @@ export const system = baseSystem
         ])
         .addPackages([
             Package("distrobox"),
-            Package("xpadneo")
+            Package("xpadneo-kmod-common")
         ])
         .applyDerivation()
     )
