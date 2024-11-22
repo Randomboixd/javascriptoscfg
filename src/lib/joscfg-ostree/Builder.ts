@@ -41,6 +41,7 @@ const stages: ((image: System) => string)[] = [
     lineBreak,
     commentedLineBreak("Add GSchemas"),
     GSchemaBuildStage,
+    lineBreak,
     commentedLineBreak("Add GNOME Extensions (if any)"),
     GnomeExtensionBuildStage,
     commentedLineBreak("Commit all changes"),
