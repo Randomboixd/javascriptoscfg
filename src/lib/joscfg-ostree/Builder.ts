@@ -23,6 +23,8 @@ const stages: ((image: System) => string)[] = [
     commentedLineBreak("Add loose channels (if any)"),
     LooseChannelsBuildStage,
     lineBreak,
+    () => { return "FROM base" },
+    lineBreak,
     commentedLineBreak("Copy stage"),
     COPYStages,
     lineBreak,
