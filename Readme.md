@@ -16,7 +16,6 @@ Also this uses bun btw.
 
 ## Licenses.
 
-## Licenses and things.
 This project is primarily licensed under the MIT License. Portions of this codebase are derived from the ublue-os/ubuntu repository, which is licensed under the Apache License 2.0. For more information, see the `LICENSE` and `LICENSE-APACHE` files.
 
 I am not really good at licenses though, as i am not a lawyer. if i did something wrong, make a pull request.
@@ -178,4 +177,117 @@ and congrats! You are now running your own container... well you will once you r
 
 ### Deriving from the base channel using Derivations
 
-... to be continued.
+> [!NOTE]
+> While you can technically modify the lists itself in the System instance, Derivations allow you reuse parts in other configurations. It is recommended that you use Derivations.
+
+Derivations allow you to change how your system will work. People using your derivation will recieve a result simular to your own build, of course not the exact same *(if you're looking for that though, try [NixOS instead?](https://nixos.org/))* because you might not use the same channel as the other user.
+
+Derivations can be made by executing the `.makeDerivation()` method on a System instance, and passing in a function that executes methods of the Derivation class, then finally calls `.applyDerivation()`, closing the Derivation.
+
+For this part, i **recommend** you read [Arrow Functions on Mozilla Web Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), because this may get confusing.
+
+```ts
+export const system = new System()
+   .setChannel("ghcr.io/ublue-os/silverblue-main", "40")
+   .setPublishedImageConfig("testimage", "The test image provided by javascriptosconfig's repo. Not for daily use.")
+   .makeDerivation(d => d
+      .applyDerivation()
+   )
+```
+
+This? Is a derivation that does **ABSOLUTELY** Nothing. Let's make it do something!
+
+#### Adding packages via Derivations
+
+**Packages!** You usually **don't want to overlay** them on your system, because upgrades will take ages... But what if you could? Instead of you manually layering the packages on your system, a GH Action will do it for you, in under 5 minutes if it's a small package! Then you download it and boom the package is **THERE**!
+
+Let's grab the example above, and say, we want ~~neofetch~~ i mean fastfetch present on our system!
+
+```ts
+export const system = new System()
+   .setChannel("ghcr.io/ublue-os/silverblue-main", "40")
+   .setPublishedImageConfig("testimage", "The test image provided by javascriptosconfig's repo. Not for daily use.")
+   .makeDerivation(d => d
+      .addPackages([
+         Package("fastfetch")
+      ])
+      .applyDerivation()
+   )
+```
+
+Before `.applyDerivation()` We added a call to `.addPackages()`, where we provided an Array containing a call to the `Package()` helper!
+
+Under the hood, `Package()` generated an object like this:
+```ts
+{
+   name: 'fastfetch',
+   packageType: { type: "rpm-ostree", method: "install" }
+}
+```
+
+You can **technically** go and replace `fastfetch` here and use that in this array, and it WOULD work, but the `Package()` helper is there for a reason. Use this to install packages if possible.
+
+> [!TIP]
+> If you base your image on an ublue image, you should also be able to install kernel modules from ublue-os/akmods. No need to look through copr! Example if you want xpadneo, you should be able to get it with the name `xpadneo-kmod-common`. For more information on what ublue builds, check out https://github.com/ublue-os/akmods!
+
+#### Adding custom repositories
+
+> [!WARNING]
+> the `Repository()` helper, as shown here adds repos to your system from an URL that ends with .repo. This was designed for use with copr repos, and other repos that have an install command that curls a .repo file into `/etc/yum.repos.d`. **WARNING: IF YOU DON'T TRUST THE SOURCE OF THE .repo FILE THEN YOU SHOULDN'T ADD IT!**
+
+> [!IMPORTANT]
+> The `Repository()` helper cannot add custom keys. If (for example) you want to install VSCode (Which you should do in a toolbox instead), then use the .execute() method on makeDerivation, and then install the package within the .execute also.
+
+Let's say you want **tailscale**. Usually their own repository releases packages a bit more quickly. You can use the `Repository()` helper to configure their repository, and then simply install tailscale!
+
+Here is an example on how you would use `Repository()`
+
+```ts
+export const system = new System()
+   .setChannel("ghcr.io/ublue-os/silverblue-main", "40")
+   .setPublishedImageConfig("testimage", "The test image provided by javascriptosconfig's repo. Not for daily use.")
+   .makeDerivation(d => d
+      .addPackages([
+         Repository("https://pkgs.tailscale.com/stable/fedora/39/tailscale.repo"),
+         Package("tailscale")
+      ])
+      .applyDerivation()
+   )
+```
+
+it doesn't matter where you drop a `Repository()` helper call. In the end, it's going to be added even before package installations happen. So you could even drop it at the end of the array, it will still be added!
+
+#### Writing custom shell scripts for use globally.
+
+> [!CAUTION]
+> `writeShellScriptBin() has a weird bug that when you try to execute it, it will do nothing, but will execute if called using /usr/bin/(shellscript name)... This will likely get fixed sometime.
+
+In `.addPackages()` we can use the `writeShellScriptBin()` helper to create a custom shell script, and make it available on the system.
+
+Just like the NixOS version, the first parameter should be the script's name, and the last is the code. Here is an example:
+
+```ts
+export const system = new System()
+   .setChannel("ghcr.io/ublue-os/silverblue-main", "40")
+   .setPublishedImageConfig("testimage", "The test image provided by javascriptosconfig's repo. Not for daily use.")
+   .makeDerivation(d => d
+      .addPackages([
+         writeShellScriptBin('helloworld', `
+         echo "wassup"
+         `)
+      ])
+      .applyDerivation()
+   )
+```
+
+It's this easy!
+
+#### End examples
+
+You can copy files from the project directory into the container, you can preinstall custom GNOME
+Extensions! You can even write GSchema overrides without even leaving typescript!
+
+For more examples on what you can do with derivations, check your docs/ folder.
+
+> [!WARNING]
+> Since currently the project is still incomplete, and i just decided to release it to the public you may need to pull from the template repository often to recieve updates.

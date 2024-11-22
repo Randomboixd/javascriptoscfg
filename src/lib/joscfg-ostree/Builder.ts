@@ -12,6 +12,39 @@ import mkImageLabels from "./buildstages/mkImageLabels";
 import RepositoriesBuildStage from "./buildstages/RepositoriesBuildStage";
 import type System from "./System";
 
+const lineBreak = () => "\n"
+const commentedLineBreak = (comment: string) => () => `# ${comment}\n`
+
+
+const stages: ((image: System) => string)[] = [
+    mkImageHeaders,
+    commentedLineBreak("Add image metadata"),
+    mkImageLabels,
+    commentedLineBreak("Add loose channels (if any)"),
+    LooseChannelsBuildStage,
+    lineBreak,
+    commentedLineBreak("Copy stage"),
+    COPYStages,
+    lineBreak,
+    commentedLineBreak("Install phase"),
+    customBuiltBinaries,
+    lineBreak,
+    RepositoriesBuildStage,
+    lineBreak,
+    buildRemovePkgs,
+    lineBreak,
+    buildAddPkgs,
+    commentedLineBreak("Execution stage"),
+    ExecStage,
+    lineBreak,
+    commentedLineBreak("Add GSchemas"),
+    GSchemaBuildStage,
+    commentedLineBreak("Add GNOME Extensions (if any)"),
+    GnomeExtensionBuildStage,
+    commentedLineBreak("Commit all changes"),
+    () => { return `RUN ${Commit()}` }
+]
+
 
 /**
  * Build a Containerfile that installs a javascriptosconfig-ostree system.
@@ -32,23 +65,10 @@ export default class Builder {
      * @returns - Containerfile's contents
      */
     public build(): string {
-        const imageHeaders = mkImageHeaders(this.image);
-        const removePkgsCommand = this.image.packages.some(p => p.packageType.type === 'rpm-ostree' && p.packageType.method === "remove")
-            ? `RUN ${buildRemovePkgs(this.image)} && \\`
-            : 'RUN echo "No packages will be removed." && \\';
-        const addPkgsCommand = this.image.packages.some(p => p.packageType.type === 'rpm-ostree' && p.packageType.method === "install")
-            ? `${buildAddPkgs(this.image)}`
-            : `echo "No packages will be installed."`
-        
-        const COPY = COPYStages(this.image)
-        const customBinaries = customBuiltBinaries(this.image)
-        const run = ExecStage(this.image)
-        const labels = mkImageLabels(this.image)
-        const schemas = GSchemaBuildStage(this.image)
-        const extensions = GnomeExtensionBuildStage(this.image)
-        const looseChannels = LooseChannelsBuildStage(this.image)
-        const repos = RepositoriesBuildStage(this.image)
-
-        return `${imageHeaders}\n# Add image labels\n${labels}\n# Add loose channels\n${looseChannels}\n# Copy stage\nFROM base\n${COPY}\n \n# Custom binaries stage\n${customBinaries}\n \n# Add repos\n${repos}\n \n# Install/Remove packages\n${removePkgsCommand}\n${addPkgsCommand}\n \n# Execution stage\n${run}\n \n# GSchema Stage\n${schemas} \n \n#GNOME Extension stage\n${extensions}\n \n# Commit everything\nRUN ${Commit()}\n# Goodbye!`.trim();
+        let baseString = ""
+        stages.forEach(stage => {
+            baseString += stage(this.image)
+        })
+        return baseString
     }
 }
