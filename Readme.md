@@ -1,3 +1,12 @@
+> [!WARNING]
+> This project is no longer being maintained... Or atleast isn't going to be maintained for a while.
+> 
+> I switched to arch linux, meaning i don't have a rpm-ostree system to try everything on.
+>
+> It doesn't mean this doesn't work though! The project works, and builds successfully. You can go ahead and follow the instructions below and get a custom rpm-ostree image!
+>
+> Have fun! And remember when you create a clone of the template, you are the one essentially maintaining it now (not that you need to do a lot though)!
+
 # Javascript OS Config
 
 *"I want to have my operating system image created by typescript!" - Said no one*
